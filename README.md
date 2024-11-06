@@ -100,138 +100,26 @@ Also connect keyboard and mouse.
 
 # Set up the Raspberry Pi
 
-## Prepare the SD card with Raspbian operating system for Raspberry Pi
+Here is the easiest way to install the OpenSky feeder on a Raspberry Pi 2B+ with Windows.
+This is based on the OpenSky receiver kit readme available here https://github.com/openskynetwork/receiver-kit.
 
-Follow the [NOOBS Setup](https://www.raspberrypi.org/help/videos/) instructions. In short:
-* [Download](https://www.sdcard.org/downloads/formatter_4/index.html) and install the SDFormatter (a software to format your microSDHC card).
-* Insert your microSDHC memory card into your PC (using the SD adapter).
-* Format the microSDHC card using SDFormatter. Make sure you've selected the correct drive letter. Use the options `FORMAT TYPE` `FULL (Erase)` and `FORMAT SIZE ADJUSTMENT` `OFF`.
-* [Download](https://www.raspberrypi.org/downloads/noobs/) and unzip NOOBS ("New Out Of the Box Software", an easy operating system installer for Raspberry Pi).
-* Copy the uzipped NOOBS files to the freshly formatted microSDHC card.
-* Safely eject the memory card.
+- Create an account on https://opensky-network.org/
+- Erase all the partitions from a SD card (>32Go) using windows disk manager (Windows key + R, type "diskmgmt.msc" + Enter). Be sure to modify the SD card!
+- Download and install Win32DiskImager
+- Download the last image available here https://github.com/openskynetwork/receiver-kit?tab=readme-ov-file#updating-your-receiver
+- Use Win32DiskImager to write it on the SD card
+- Edit the file opensky\config.txt from the Fat32 partition, set the latitude, longitude and altitude of the device, remove the "#" before "Username" and type your opensky-network username
+- Put the SD card in the Raspberry Pi, connect a keyboard, a Wifi USB key and a screen
+- Start it, wait for the installation to complete
+- When prompted, enter the login "pi" and the password "oskydefault" (caution: QWERTY keyboard)
+- Change this password typing "passwd"
+- Type "sudo touch ssh"
+- Type "sync"
+- Type "nmtui" and configure the Wifi connection
+- Type "reboot"
 
-## Install Raspbian
+It should work...
 
-* Insert the card into Raspberry Pi.
-* Connect the power.
-* Perform the Raspbian installation.
-* Configure the system after installation (you'd typically want to set region and locale and change the default password (`pi`/`raspberry`).
-* Set up the WLAN/internet connection.
-* Update and upgrade the system:
-```
-sudo apt-get update
-sudo apt-get upgrade
-```
-* Install `git-core` and `git`:
-```
-sudo apt-get install git-core git
-```
-
-Now your Raspberry Pi is ready to be used.
-
-## Set up RTL-SDR drivers and `dump1090`
-
-### Check out the `raspberry-pi-adsb` project
-
-```
-cd ~
-git clone https://github.com/openskynetwork/raspberry-pi-adsb.git
-chmod +x ~/raspberry-pi-adsb/*.sh
-```
-
-### Set up RTL-SDR drivers
-
-Check out, build and install drivers for the RTL-SDR receiver:
-
-```
-cd ~/raspberry-pi-adsb
-./setup-rtl-sdr.sh
-```
-
-You will be prompted to reboot after the set up.
-
-After the system rebooted, you can check the RTL-SDR connection by running:
-
-```
-rtl_test
-```
-
-You should be seeing something like:
-
-```
-Found 1 device(s):
-  0:  Realtek, RTL2838UHIDIR, SN: 00000001
-
-Using device 0: Generic RTL2832U OEM
-Found Rafael Micro R820T tuner
-Supported gain values (29): 0.0 0.9 1.4 2.7 3.7 7.7 8.7 12.5 14.4 15.7 16.6 19.7 20.7 22.9 25.4 28.0 29.7 32.8 33.8 36.4 37.2 38.6 40.2 42.1 43.4 43.9 44.5 48.0 49.6 
-[R82XX] PLL not locked!
-Sampling at 2048000 S/s.
-
-Info: This tool will continuously read from the device, and report if
-samples get lost. If you observe no further output, everything is fine.
-
-Reading samples in async mode...
-```
-
-This means RTL-SDR drivers were compiled and installed successfully.
-
-### Set up `dump1090`
-
-[`dump1090`](https://github.com/MalcolmRobb/dump1090) decodes signals coming from the RTL-SDR receiver.
-
-Check out, build and install `dump1090`:
-
-```
-cd ~/raspberry-pi-adsb
-./setup-dump1090.sh
-```
-The `setup-dump1090.sh` also installs `dump1090` as a service so that `dump1090` starts automatically after system restart.
-
-You will be once again prompted to reboot after the set up. 
-
-After the system rebooted, you might want to check if `dump1090` is running correctly. Just go to `http://127.0.0.1:8080` in the browser on Raspberry Pi, you should see a map with planes.
-
-![Screenshot of dump1090 on localhost](images/dump1090-on-localhost.png)
-
-Alternatively, you can start `dump1090` in the interactive mode from the command line. To do this, first stop the running `dump1090` service:
-
-```
-sudo /etc/init.d/dump1090.sh stop
-```
-
-Now start the `dump1090` in the interactive mode:
-
-```
-~/dump1090/dump1090 --interactive --gain -10 --net --net-beast
-```
-
-You should be getting output like:
-
-```
-Hex     Mode  Sqwk  Flight   Alt    Spd  Hdg    Lat      Long   Sig  Msgs   Ti|
--------------------------------------------------------------------------------
-3C4B4C  S                    34000  470  344                      5    39    1
-44D076  S                    25000                                4     5    1
-3C66B3  S     2037  DLH8YA   19475  339  121   48.916   11.190    4    27    5
-040032  S     2540  ETH707    5875  273  119   49.905    8.698    8   113    0
-3C6DCD  S     7610           31000  465  108                      4    12    1
-44A8A2  S     1000  JAF83X   34625  454  292                      5   130    2
-710105  S     2702  SVA116   33000  510  125   49.382    7.167    4   156    1
-...
-```
-
-Finally, start the `dump1090` service again:
-
-```
-sudo /etc/init.d/dump1090.sh start
-```
-
-### Install the feeder
-
-Just follow the steps mentioned here: https://opensky-network.org/community/projects/30-dump1090-feeder
-
-Once you set everything up and entered your OpenSky username correctly, it'll show up in your receiver profile (My OpenSky > Receiver Profile).
 
 # Credits
 
